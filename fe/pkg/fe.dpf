@@ -1,0 +1,41 @@
+# fe.dpf -- 2010-05-14		
+		
+# internal variables
+src = ../src
+htdocs = /home/bolt/share/htdocs/cdn/fe
+pear = /home/bolt/share/pear/cdn/fe
+conf = /home/bolt/conf/httpd/
+assets = /home/bolt/share/htdocs/assets/cdn
+
+# meta data
+meta project = cdn
+meta name = fe
+meta version = file:changelog
+meta summary = Front End
+meta description = cdn Front End
+meta changelog = changelog
+
+# settings
+set host cdnimag.es
+set port 80
+set listen 
+set dbhost localhost
+
+# directorys
+dir - - - $(htdocs)
+dir - - - $(pear)
+dir - - - $(conf)
+dir - - - $(assets)
+
+# assets
+find - - - $(assets) $(src)/assets/ -depth -name "*.*"
+
+# pear
+find - - - $(pear)	$(src)/ -depth -name "*.php" 
+
+# set our conf file
+settings $(conf)	../conf/cdn_fe.conf
+
+# post install
+command post-install /etc/init.d/httpd restart
+command post-set /etc/init.d/httpd restart

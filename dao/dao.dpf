@@ -1,0 +1,19 @@
+# dao.dpf -- 2010-05-14		
+		
+# internal variables
+src = ./src
+pear = /home/bolt/share/pear/cdn/dao
+
+# meta data
+meta project = cdn
+meta name = dao
+meta version = file:changelog
+meta summary = DAO
+meta description = DAO
+meta changelog = changelog
+
+# directorys
+dir - - - $(pear)
+
+# pear
+find - - - $(pear)	$(src)/ -depth -name "*.php" 

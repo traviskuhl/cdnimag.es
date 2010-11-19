@@ -1,0 +1,19 @@
+# class.dpf -- 2010-08-06		
+		
+# internal variables
+src = ./src
+pear = /home/bolt/share/pear/cdn/class
+
+# meta data
+meta project = cdn
+meta name = class
+meta version = file:changelog
+meta summary = cdn class
+meta description = cdn base class
+meta changelog = changelog
+
+# dir
+dir - - - $(pear)
+
+# pear
+find - - - $(pear)	$(src)/ -depth -name "*.php" 

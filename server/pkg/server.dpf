@@ -1,0 +1,37 @@
+# server.dpf -- 2010-05-14		
+		
+# internal variables
+src = ../src
+htdocs = /home/bolt/share/htdocs/cdn/server
+pear = /home/bolt/share/pear/cdn/server
+conf = /home/bolt/conf/httpd/
+
+# meta data
+meta project = cdn
+meta name = server
+meta version = file:changelog
+meta summary = Server
+meta description = Server
+meta changelog = changelog
+
+# settings
+set host 173.255.201.105
+set port 80
+set listen Listen 80
+
+
+# directorys
+dir - - - $(htdocs)
+dir - - - $(pear)
+dir - - - $(conf)
+
+# pear
+find - - - $(pear)		$(src)/ -depth -name "*.php" -not -name "index.php"
+find - - - $(htdocs)	$(src)/ -depth -name "index.php" 
+
+# set our conf file
+settings $(conf)	../conf/cdn_server.conf
+
+# post install
+command post-install /etc/init.d/httpd restart
+command post-set /etc/init.d/httpd restart
