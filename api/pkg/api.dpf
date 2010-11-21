@@ -1,0 +1,39 @@
+# api.dpf -- 2010-05-14		
+		
+# internal variables
+src = ../src
+htdocs = /home/bolt/share/htdocs/cdn/api
+pear = /home/bolt/share/pear/cdn/api
+conf = /home/bolt/conf/httpd/
+
+# meta data
+meta project = cdn
+meta name = api
+meta version = file:changelog
+meta summary = API
+meta description = API
+meta changelog = changelog
+
+# settings
+set host api.cdnimag.es
+set port 80
+set listen 
+set dbhost localhost
+
+# directorys
+dir - - - $(htdocs)
+dir - - - $(pear)
+dir - - - $(conf)
+
+# hdocs
+find - - - $(htdocs)	$(src)/ -depth -name "*.php"
+
+# pear
+find - - - $(pear)	$(src)/ -depth -name "*.php"
+
+# set our conf file
+settings $(conf)	../conf/cdn_api.conf
+
+# post install
+command post-install /etc/init.d/httpd restart
+command post-set /etc/init.d/httpd restart

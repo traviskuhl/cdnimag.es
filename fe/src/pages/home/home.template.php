@@ -2,7 +2,7 @@
 Hello <?php echo $_account->domain; ?>
 <div>
 	<a href="/home?do=logout">Logout</a> | 
-	Your Secret: <?php echo $_account->cred->sig; ?>
+	API Key: <?php echo $_account->cred->key; ?> -- Secret: <?php echo $_account->cred->sig; ?>
 </div>
 </h2>
 
@@ -10,29 +10,49 @@ Hello <?php echo $_account->domain; ?>
 <div class="wrap wrap-pad">
 
 	<?php if ( $_account->dist == false ) { ?> 			
-		<h3>Create a CloudFront Distribution</h3>
-		<p>You need to set up your CloudFront Distribtion before you can continue using cdnimag.es!</p>
-		
+		<h3>How do you want this to work?</h3>
+		<p>How would you like to use our service?</p>
+	
 		<form method="post" action="/home">
-			<input type="hidden" name="do" value="dist">
-			<ul>
+			<input type="hidden" name="do" value="dist">	
+		
+			<ul class="dist-opts">
 				<li>
-					<label>
-						<em>Amazon Key</em>
-						<input type="text" name="f[key]" value="<?php echo p('key', false, $f); ?>">
-					</label>
+					<h4><em>Simple</em> (no aws account required)</h4>
+					<input type="radio" name="opt" value="1" checked="checked" onclick="Y.one('#_aws').toggleClass('hidden');">					
+					<p>No need to use your Amazon AWS account. We'll do all the heavy lifting for you.</p>
 				</li>
 				<li>
-					<label>
-						<em>Amazon Secret</em>
-						<input type="password" name="f[sec]" value="<?php echo p('sec', false, $f); ?>">
-					</label>
-				</li>	
-				<li>
-					<button type="submit">Continue</button>
+					<h4><em>Advanced</em> (aws account required)</h4>
+					<input type="radio" name="opt" value="2" onclick="Y.one('#_aws').toggleClass('hidden');">
+					<p>We'll set up a custom CloudFront Origin and S3 bucket for you.</p>			
+					
+					<ul class="hidden" id="_aws">
+						<li>
+							<label>
+								<em>Amazon Key</em>
+								<input type="text" name="f[key]" value="<?php echo p('key', false, $f); ?>">
+							</label>
+						</li>
+						<li>
+							<label>
+								<em>Amazon Secret</em>
+								<input type="password" name="f[sec]" value="<?php echo p('sec', false, $f); ?>">
+							</label>
+						</li>	
+					</ul>					
+					
 				</li>
+				<li><button type="submit">Continue</button>	</li>
 			</ul>
+		
+
 		</form>
+		
+	<?php } else if ( $_account->dist_default == true ) { ?>		
+	
+		hello		
+		
 	<?php } else if ( $_account->dist_verified == false ) { ?>
 	
 		<h3>Verifing your CloudFront Distribution</h3>
@@ -55,7 +75,7 @@ Hello <?php echo $_account->domain; ?>
 				</li>
 			</ul>
 			
-		</form>
+		</form>	
 	
 	<?php } else { ?>
 

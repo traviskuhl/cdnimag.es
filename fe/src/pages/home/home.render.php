@@ -41,81 +41,118 @@ class home extends FrontEnd {
 			// k and s
 			$k = $f['key'];
 			$s = $f['sec'];
-			$save = $f['save'];
+			$opt = p('opt');
 		
 			// if yes 
-			if ( $k AND $s ) {
-	
+			if ( $opt == '1' ) {
+			
 				// s3
-				$s3 = new S3($k, $s);
+				$s3 = new S3("0C58D2XWN5KXX21K80R2", "zg8W75K62lQrVv/lu7/SEalZjd2xu8wLpt9hvK5a");			
 			
-				// good
-				$good = false;
-			
-				// first check to see if they have dist already
-				try {
-
-					// dist
-					$dist = $s3->getDistribution($a->domain);
-					
-					// what up 
-					if ( $dist->error !== false AND $dist->code == '403' ) {
-						$args['msg'] = "The AWS Key &amp; Secret are invalid.";
-					}
-					else if ( $dist->error !== false AND $dist->code == '404' ) {
-						$good = true;
-					}
-					else {
-						$args['msg'] = "Something went wrong";
-					}
-					
-				}
-				catch ( Exception $e ) {  }
+				// save our dist 
+				$a->dist = array(
+					'created' => time(),
+					'default' => true,
+				);
+	
+				// add an id
+				$id = uniqid();
 				
-				// what up
-				if ( $good === true ) {
-					
-					// create our dist
-					$r = $s3->createDistribution(
-						"http://".$a->domain,
-						true,
-						array(),
-						"Create by cdnimag.es at ".date("r")
-					);
-					
-					// yes
-					if ( $r !== false ) {
-					
-						// update our account
-						$a->dist = array(
-							'created' => time(),
-							'verified' => false,
-							'id' => $r['id']
-						);
-													
-						// save aws
-						$a->aws = array(
-							'key' => $k,
-							'secret' => $s
-						);
-					
-						// save
-						$a->save();
-						
-						// go here
-						$this->go( b::url('home') );
-					
-					}
-
-					// msg
-					$args['msg'] = "We couldn't create your distribution. Try again!";
+				// add it 
+				$b = array(
+					'added' => time(),
+					'sig' => true,
+					'default' => true,
+					'expire' => p('expire', '1y', $f),
+					'name' => $a->domain
+				);		
 				
-				}
+				// create the bucket
+				$s3->putBucket($a->domain, S3::ACL_PUBLIC_READ);
 			
+				// add it 
+				$a->push('buckets', $b, $id);
+				
+				// save
+				$a->save();
+				
 			}
-			
-			// form
-			$args['form'] = $f;
+			else {
+				
+				if ( $k AND $s ) {
+		
+					// s3
+					$s3 = new S3($k, $s);
+				
+					// good
+					$good = false;
+				
+					// first check to see if they have dist already
+					try {
+	
+						// dist
+						$dist = $s3->getDistribution($a->domain);
+						
+						// what up 
+						if ( $dist->error !== false AND $dist->code == '403' ) {
+							$args['msg'] = "The AWS Key &amp; Secret are invalid.";
+						}
+						else if ( $dist->error !== false AND $dist->code == '404' ) {
+							$good = true;
+						}
+						else {
+							$args['msg'] = "Something went wrong";
+						}
+						
+					}
+					catch ( Exception $e ) {  }
+					
+					// what up
+					if ( $good === true ) {
+						
+						// create our dist
+						$r = $s3->createDistribution(
+							"http://".$a->domain,
+							true,
+							array(),
+							"Create by cdnimag.es at ".date("r")
+						);
+						
+						// yes
+						if ( $r !== false ) {
+						
+							// update our account
+							$a->dist = array(
+								'created' => time(),
+								'verified' => false,
+								'id' => $r['id']
+							);
+														
+							// save aws
+							$a->aws = array(
+								'key' => $k,
+								'secret' => $s
+							);
+						
+							// save
+							$a->save();
+							
+							// go here
+							$this->go( b::url('home') );
+						
+						}
+	
+						// msg
+						$args['msg'] = "We couldn't create your distribution. Try again!";
+					
+					}
+				
+				}
+				
+				// form
+				$args['form'] = $f;
+				
+			}
 		
 		}
 		

@@ -2,6 +2,8 @@ html,body {
 	background: #eee;
 }
 
+.hidden {display: none;}
+
 #doc {
 	width: 750px;
 	margin: 0 auto;
@@ -259,6 +261,33 @@ html,body {
 #bd .terms p {
 	margin-bottom: 10px;
 }
+
+#bd form ul.dist-opts li {
+	clear: both;
+}
+
+#bd form ul.dist-opts li h4 {
+	color: #888;
+	margin-bottom: 10px;
+}
+
+#bd form ul.dist-opts li h4 em {
+	display: inline;
+	font-weight: bold;
+	color: #333;
+	font-size: 116%;	
+}
+
+#bd form ul.dist-opts li input {
+	float: left;
+	width: auto;
+	margin-left: 10px;
+}
+
+#bd form ul.dist-opts li p {
+	margin-left: 20px;
+}
+
 
 #ft {
 	padding: 10px;

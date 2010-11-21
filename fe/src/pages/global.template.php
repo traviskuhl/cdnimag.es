@@ -5,6 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.2.0/build/cssfonts/fonts-min.css&3.2.0/build/cssreset/reset-min.css&3.2.0/build/cssgrids/grids-min.css">
 		<link rel="stylesheet" type="text/css" href="/assets/cdn/css/global.css">
+		<script type="text/javascript" src="http://yui.yahooapis.com/3.2.0/build/simpleyui/simpleyui.js"></script>
 	</head>
 	<body>
 		<div id="doc">
