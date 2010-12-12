@@ -16,7 +16,7 @@
 	$name = $_SERVER['SERVER_NAME'];
 
 	// try to get an account
-	$account = new \dao\account('get',array('domain', $name));
+	$account = $domain = new \dao\account('get',array('domain', $name));
 	
 	// no account send home
 	if ( $account->id == false ) {
@@ -33,15 +33,46 @@
 		if ( count($parts) != 2 ) {
 			error("Need Commands, Sig & Path", 400);
 		}
-	
+		
 	// parse our our cmds
 	$cmds = array();
 	
-		foreach ( explode("/", trim($parts[0],'/') ) as $cmd ) {
-			list($name, $val) = explode(":", $cmd);
-			$cmds[$name] = $val;
-		}	
+		// cmdParts
+		$cmdParts = explode("/", trim($parts[0],'/') );	
+		
+		// if dist is default, we need to get the first
+		// param which should be their doman
+		if ( $name == 'idev.cdnimag.es' OR $name == 'default.cdnimag.es' ) {
+		
+			// get their domain
+			$d = array_shift($cmdParts);
+			
+			// and push it onto part 2
+			$parts[1] = $d . "/" . trim($parts[1],'/');
+			
+			// domain
+			$domain = new \dao\account("get", array('domain', $d));
+			
+			// bad domain?
+			if ( $domain->id === false ) {
+				error("Could not find provided domain", 403);			
+			}
+			
+		}
 	
+		// spliut out each bucket
+		foreach ( $cmdParts as $cmd ) {
+			if ( strpos($cmd, ':') !== false ) {
+				list($name, $val) = explode(":", $cmd);
+				$cmds[$name] = $val;
+			}
+		}				
+		
+		// if dist is default, no buckets allowed
+		if ( $account->dist_default ) {
+			unset($cmds['bucket']);
+		}		
+		
 	// figure out which bucket 
 	if ( !isset($cmds['bucket']) ) {
 	
@@ -57,7 +88,7 @@
 	// good
 	$good = false;
 	$b = false;
-	
+			
 	// make sure it's valid 
 	foreach ( $account->buckets as $item ) {
 		if ( $item->name == $cmds['bucket'] OR $item->alias == $cmds['bucket'] ) {
@@ -74,6 +105,7 @@
 	if ( $good === false OR $b === false ) {
 		error("Could not find bucket given.", 404);
 	}
+
 	
 	// do we need to check sig
 	if ( $b->sig == true ) {
@@ -81,17 +113,18 @@
 		// no sig
 		if ( !isset($cmds['sig']) ) {
 			error("No signature provided", 400);
-		}
+		}	
 		
 		// no sig
 		$nosig = preg_replace(array("#sig\:([a-zA-Z0-9]+)#","#//#"), array("","/"), $path);
 		
 		// match our sig
-		if ( $cmds['sig'] != md5($account->cred->secret.$nosig) ) {
+		if ( $cmds['sig'] != md5($domain->cred->sig.$nosig) ) {
 			error("Invalid Signature", 403);	
 		}	
 		
 	}
+
 	
 	// s3
 	$s3 = new S3( $account->aws->key, $account->aws->secret);
@@ -103,7 +136,7 @@
 	catch ( Exception $e ) { error("Could not request image", 404); }
 	
 	// not found
-	if ( $obj->code != 200 ) {
+	if ( !is_object($obj) OR ( is_object($obj) AND $obj->code != 200 ) ) {
 		error("Could not find image.", 404);
 	}
 

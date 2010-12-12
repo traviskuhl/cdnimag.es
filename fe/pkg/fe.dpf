@@ -15,11 +15,15 @@ meta summary = Front End
 meta description = cdn Front End
 meta changelog = changelog
 
-# settings
+# fe settings
 set host cdnimag.es
 set port 80
 set listen 
 set dbhost localhost
+
+# api
+set api.host api.cdnimag.es
+set api.port 80
 
 # directorys
 dir - - - $(htdocs)
