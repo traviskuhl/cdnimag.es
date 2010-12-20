@@ -1,3 +1,12 @@
+@-webkit-keyframes fade {
+ from {
+	opacity: .5;
+ }
+ to {
+	opacity: 1;
+ }
+}
+
 html,body {
 	background: #eee;
 }
@@ -41,6 +50,12 @@ html,body {
 	border-bottom: solid 1px #eee;
 }
 
+#bd h2 a {
+	color: #888;
+	font-size: 13px;
+	text-decoration: none;
+}
+
 #bd h2 div a,
 #bd h2 div {
 	font-size: 11px;
@@ -73,9 +88,21 @@ html,body {
 }
 
 #bd form.signup {
-	border-right: solid 1px #fff;
+	border-right: solid 5px #fff;
 }
 
+#bd form.signin,
+#bd form.signup {
+	opacity: .5;
+    -webkit-transition-property: -webkit-transform, opacity;
+    -webkit-transition-duration: .1s, .5s;
+    -webkit-transition-timing-function: ease-out, cubic-bezier(0.5, 0.2, 0.3, 1.0);
+}
+
+#bd form.signin:hover,
+#bd form.signup:hover {
+	opacity: 1;
+}
 
 #bd form ul li {
 	clear: both;
@@ -94,7 +121,8 @@ html,body {
 #bd form ul li input {
 	border: solid 1px #ccc;
 	padding: 5px;
-	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
 	color: #333;
 	width: 80%;
 }
@@ -156,6 +184,10 @@ html,body {
 #bd ul.buckets li h4 {
 	font-size: 121%;
 	float: left;
+}
+
+#bd ul.buckets li h4 a {
+	color: #333;
 }
 
 #bd ul.buckets li em {
@@ -229,10 +261,18 @@ html,body {
 	display: block;
 	color: #333;
 	margin: 5px 0;
+	font-size: 93%;
 }
 
-#bd ul.toc:after,
-#bd ul.buckets li:after {content:'.';visibility:hidden;clear:left;height:0;display:block}
+#bd ul.docs li code a {
+	color: #333;
+}
+
+#bd ul.docs li em {
+	font-weight: bold;
+}
+
+
 
 #bd .terms {
 	padding: 20px;
@@ -289,6 +329,61 @@ html,body {
 }
 
 
+form.invite {
+	background: #eee;
+	border-bottom: solid 5px #fff;
+}
+
+form.invite fieldset {
+	padding: 10px;
+}
+
+#bd form.invite fieldset p {
+	display: block;
+	width: 250px;
+	float: left;
+	padding: 30px 0 0 0;
+	font-size: 83%;
+}
+
+form.invite fieldset legend {
+	position: absolute;
+	font-size: 167%;
+	color: #222;
+}
+
+form.invite fieldset input {
+	padding: 10px;
+	background: #fff;
+	border: none;
+	margin: 10px 0 0 50px;
+	width: 200px;
+	font-family: Helvetica;	
+	font-size: 15px;
+	color: #999;
+	border: solid 1px #ccc;
+	border-radius: 5px;
+	-moz-border-radius: 5px;	
+}
+
+form.invite fieldset input.on {
+	color: #333;
+}
+
+form.invite fieldset button {
+	border: solid 5px #fff;
+	background: #efefef;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	padding: 5px 10px;
+	font-weight: bold;
+	color: #777;
+	-webkit-box-shadow: 0px 0px 5px #ccc;
+	cursor: pointer;	
+	text-shadow: #fff 1px 1px 1px;
+	text-transform: uppercase;
+}
+
 #ft {
 	padding: 10px;
 	text-align: center;
@@ -297,3 +392,48 @@ html,body {
 }
 
 #ft a { color: #888; }
+
+
+ul.examples li {
+	clear: both;
+	padding: 10px;
+	border-bottom: solid 1px #eee;
+	min-height: 100px;
+}
+
+
+
+ul.examples li h3 {
+	width: 200px;
+	float: left;
+	position: relative;
+	text-align: right;
+}
+
+ul.examples li div {
+	margin-left: 230px;
+}
+
+ul.examples li div a {
+	color: #888;
+	text-decoration: none;
+	display: block;
+	font-size: 93%;
+}
+
+ul.examples li img {
+	border: solid 1px #eee;
+}
+
+ul.examples li.explain {
+	background: #eee;
+	min-height: 0;
+	text-align: center;
+	font-weight: bold;
+	padding: 20px;
+}
+
+
+ul.examples li:after,
+#bd ul.toc:after,
+#bd ul.buckets li:after {content:'.';visibility:hidden;clear:left;height:0;display:block}

@@ -46,35 +46,17 @@ class home extends FrontEnd {
 			// if yes 
 			if ( $opt == '1' ) {
 			
-				// s3
-				$s3 = new S3("0C58D2XWN5KXX21K80R2", "zg8W75K62lQrVv/lu7/SEalZjd2xu8wLpt9hvK5a");			
-			
 				// save our dist 
 				$a->dist = array(
 					'created' => time(),
 					'default' => true,
 				);
-	
-				// add an id
-				$id = uniqid();
-				
-				// add it 
-				$b = array(
-					'added' => time(),
-					'sig' => true,
-					'default' => true,
-					'expire' => p('expire', '1y', $f),
-					'name' => $a->domain
-				);		
-				
-				// create the bucket
-				$s3->putBucket($a->domain, S3::ACL_PUBLIC_READ);
-			
-				// add it 
-				$a->push('buckets', $b, $id);
 				
 				// save
 				$a->save();
+			
+				// go here
+				$this->go( b::url('home') );			
 				
 			}
 			else {
@@ -231,8 +213,10 @@ class home extends FrontEnd {
 			// new or existing
 			if ( $f['new'] != "" ) {
 			
+				$f['new'] .= "." . $a->domain;
+			
 				// create the bucket
-				$args['s3']->putBucket("{$f['new']}.{$a->domain}", S3::ACL_PUBLIC_READ);
+				$args['s3']->putBucket($f['new'], S3::ACL_PUBLIC_READ);
 
 				// name
 				$b['name'] = $f['new'];
@@ -273,6 +257,23 @@ class home extends FrontEnd {
 				$args['bmsg'] = "The bucket name or alias already exists";
 			}
 			
+		
+		}
+	
+		// if dist and dist created and no domain and cnames
+		if ( $a->dist_default === false AND $a->dist_verified === true AND $a->dist_domain === false ) {
+			
+			// dist
+			$dist = $args['s3']->getDistribution($a->dist->id);					
+			
+			// set
+			$a->dist_domain = $dist['domain'];
+			
+			// cnames
+			$a->dist_cnames = ($a->dist_cnames ? array_values(p('cnames', false, $dist)) : array());
+		
+			// save
+			$a->save();
 		
 		}
 	

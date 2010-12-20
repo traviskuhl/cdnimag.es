@@ -14,6 +14,12 @@ class index extends FrontEnd {
 				$args
 			);
 		}
+		else if ( $do == 'examples' ) {
+			return Controller::renderPage(
+				'index/examples',
+				$args
+			);			
+		}
 	
 		// starter
 		$args['r'] = $args['l'] = array();
@@ -42,6 +48,11 @@ class index extends FrontEnd {
 			$args['l'] = $f;		
 		
 		}
+		
+		// invites
+		$codes = array(
+			'hackernews' => 100,			
+		);
 	
 		if ( $do == 'reg' ) {
 		
@@ -49,8 +60,9 @@ class index extends FrontEnd {
 			$f = p('f');
 			
 			// email
-			$e = $f['email'];
-			$d = preg_replace("/[^a-zA-Z0-9]+/","",$f['domain']).".cdnimag.es";
+			$e = p('email', false, $f);
+			$d = preg_replace("/[^a-zA-Z0-9]+/", "", p('domain', false, $f)).".cdnimag.es";
+			$i = strtolower(p('invite', "", $f));
 		
 			// check for user and domain
 			$u = new \dao\user('get',array($e));
@@ -58,8 +70,27 @@ class index extends FrontEnd {
 			// account
 			$a = new \dao\account('get',array('domain', $d));
 			
+			// need an invite code
+			if ( !array_key_exists($i, $codes) ) {
+				$args['r_error'] = "Invalid Invite Code"; $e = false;
+			}
+			else {
+			
+				// cid
+				$cid = "invites_{$i}";
+				
+				// how many
+				$used = (int)$this->cache->p_get($cid);
+		
+				// if used is more
+				if ( $used > $codes[$i] ) {
+					$args['r_error'] = "Sorry. All of the invites are used up."; $e = false;
+				}
+			
+			}
+			
 			// yes
-			if ( $e AND $d AND $f['pass'] AND $u->id == false AND $a->id == false ) {
+			if ( $e AND $d AND p('pass', false, $f) AND $u->id == false AND $a->id == false ) {
 				
 				// create the user
 				$u->set(array(
@@ -84,7 +115,7 @@ class index extends FrontEnd {
 				
 				// key and secret
 				$a->cred = array(
-					'key' => $this->randomString(20),
+					'key' => sha1($this->randomString(20)),
 					'sig' => $this->randomString(30),
 				);
 			
@@ -94,11 +125,17 @@ class index extends FrontEnd {
 				// login
 				$s->login($e, $u->password, true);
 			
+				// cid
+				$cid = "invites_{$i}";
+				
+				// inc
+				$this->cache->increment($cid);			
+			
 				// reload
 				$this->go( b::url('home') );				
 			
 			}
-			else {
+			else if ( !isset($args['r_error']) ) {
 				$args['r_error'] = "The Email or Domain you're using are already in our system. Try Again";			
 			}
 		

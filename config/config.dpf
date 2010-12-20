@@ -6,14 +6,20 @@ config = /home/bolt/config
 
 # meta data
 meta project = cdn
-meta name = cdn
+meta name = config
 meta version = file:changelog
 meta summary = CDN
 meta description = CDN
 meta changelog = changelog
 
+# set
+set db.host localhost
+set mongo.host localhost
+set mongo.user m0ng0A6m1n
+
 # dir
 dir - - - $(config)
 
-# pear
-find  - - - $(config) 	$(src)/		-name '*.ini'
+# setting files
+settings $(config) $(src)/cdn.ini
+settings $(config) $(src)/cdn_api.ini

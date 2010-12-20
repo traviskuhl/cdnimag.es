@@ -20,7 +20,7 @@
 	
 	// no account send home
 	if ( $account->id == false ) {
-		header("Location:http://cdnimag.es"); exit;
+		header("Location:http://cdnimag.es?error=no_acct_server"); exit;
 	}
 	
 	// path
@@ -45,10 +45,7 @@
 		if ( $name == 'idev.cdnimag.es' OR $name == 'default.cdnimag.es' ) {
 		
 			// get their domain
-			$d = array_shift($cmdParts);
-			
-			// and push it onto part 2
-			$parts[1] = $d . "/" . trim($parts[1],'/');
+			$d = array_shift($cmdParts);			
 			
 			// domain
 			$domain = new \dao\account("get", array('domain', $d));
@@ -56,7 +53,7 @@
 			// bad domain?
 			if ( $domain->id === false ) {
 				error("Could not find provided domain", 403);			
-			}
+			}			
 			
 		}
 	
@@ -69,18 +66,33 @@
 		}				
 		
 		// if dist is default, no buckets allowed
-		if ( $account->dist_default ) {
+		if ( $domain->dist_default ) {
+			
+			// no buckets
 			unset($cmds['bucket']);
+			
+			// reset account to default
+			$account = new \dao\account('get',array('domain', 'default.cdnimag.es'));
+			
+			// and push it onto part 2
+			$parts[1] = $domain->domain . "/" . trim($parts[1],'/');
+			
 		}		
+				
 		
 	// figure out which bucket 
-	if ( !isset($cmds['bucket']) ) {
+	if ( !isset($cmds['bucket']) ) {	
 	
 		// loop through all and find one
 		foreach ( $account->buckets as $item ) {
 			if ( $item->default === true ) {
 				$cmds['bucket'] = ($item->alias ? $item->alias : $item->name); break;
 			}
+		}
+	
+		// none selected
+		if ( !isset($cmds['bucket']) ) {
+			$cmds['bucket'] = $account->buckets->item('first')->name;
 		}
 	
 	}
@@ -108,7 +120,7 @@
 
 	
 	// do we need to check sig
-	if ( $b->sig == true ) {
+	if ( $b->sig == true AND $domain->domain != 'demo.cdnimag.es' ) {
 			
 		// no sig
 		if ( !isset($cmds['sig']) ) {
@@ -134,87 +146,116 @@
 		$obj = $s3->getObject($b->name, trim($parts[1],"/"));
 	}
 	catch ( Exception $e ) { error("Could not request image", 404); }
-	
+		
 	// not found
 	if ( !is_object($obj) OR ( is_object($obj) AND $obj->code != 200 ) ) {
 		error("Could not find image.", 404);
+	}	
+	
+	// type
+	if ( !isset($cmds['output']) ) {	
+		switch($obj->headers['type']) {
+			case 'image/png': $cmds['output'] = "png"; break;
+			case 'image/jpeg': $cmds['output'] = "jpg"; break;
+			case 'image/gif': $cmds['output'] = "gif"; break;
+		};			
 	}
 
-	// thumb
-	$t = Image_Tools::factory('thumbnail');
+	// new i
+	$i = new Imagick();
+	
+	$i->readimageblob($obj->body);
 
-	// get the image
-	$t->set('image', $obj->body);
-		
-	// loop 
-	foreach ( $cmds as $key => $value ) {
-		switch($key) {
-			
-			// crop
-			case 'crop':
-				if ( $value == 'true' ) { $t->set('method', IMAGE_TOOLS_THUMBNAIL_METHOD_CROP); } break;
-			
-			// size
-			case 'size':
-				list($w, $h) = explode("x", $value);
-						
-				$t->set('width', (int)$w);
-				$t->set('height', (int)$h);	break;			
-			
-			// percent
-			case 'percent':
-				$t->set('percent', (int)$value); break;
-				
-			// scale
-			case 'scale':
-				switch($value) {
-					case "min": $t->set("valign", IMAGE_TOOLS_THUMBNAIL_METHOD_SCALE_MIN); break;
-					case "max": $t->set("valign", IMAGE_TOOLS_THUMBNAIL_METHOD_SCALE_MAX); break;
-				};
-				break;
-				
-			// valign
-			case 'valign':
-				switch($value) {
-					case "top": $t->set("valign", IMAGE_TOOLS_THUMBNAIL_ALIGN_TOP); break;
-					case "bottom": $t->set("valign", IMAGE_TOOLS_THUMBNAIL_ALIGN_BOTTOM); break;
-					case "center": $t->set("valign", IMAGE_TOOLS_THUMBNAIL_ALIGN_CENTER); break;
-					default: $t->set("valign", (int)$value); 
-				};
-				break;
+	// page
+	$page = $i->getImagePage();
+	
+	$v = p('valign', 'center', $cmds);
+	$h = p('halign', 'center', $cmds);
 
-			// halign
-			case 'halign':
-				switch($value) {
-					case "left": $t->set("halign", IMAGE_TOOLS_THUMBNAIL_ALIGN_LEFT); break;
-					case "right": $t->set("halign", IMAGE_TOOLS_THUMBNAIL_ALIGN_RIGHT); break;
-					case "center": $t->set("halign", IMAGE_TOOLS_THUMBNAIL_ALIGN_CENTER); break;					
-					default: $t->set("halign", (int)$value); 
-				};
-				break;
-			
-		};
+	// size
+	if ( isset($cmds['size']) ) {
+		list($cmds['width'], $cmds['height']) = explode("x", $cmds['size']);
+	}
+	else if ( isset($cmds['percent']) ) {
+        $cmds['width'] = floor($cmds['percent'] / 100 * $page['width']);
+        $cmds['height'] = floor($cmds['percent'] / 100 * $page['height']);	
+	}	
+	else {
+		$cmds['width'] = $page['width'];
+		$cmds['height'] = $page['height'];
 	}
 	
+	
+	
+	// frame
+	if ( isset($cmds['frame']) ) {
+	
+		$width = $cmds['width'];
+		$height = $cmds['height'];
+	
+		// ratio
+		$ratio_orig = $page['width'] / $page['height'];
+		
+		if ( $page['width'] > $page['height'] ) {
+			if ($width/$height < $ratio_orig) {
+			   $width = $height*$ratio_orig;
+			} else {
+			   $height = $width/$ratio_orig;
+			}					
+		}
+		else {
+			if ($width/$height < $ratio_orig) {
+			   $width = $height*$ratio_orig;
+			} else {
+			   $height = $width/$ratio_orig;
+			}					
+		}
+		
+		// scale
+		$i->scaleImage($width, $height);		
+		
+		// page
+		$page['width'] = $width;
+		$page['height'] = $height;
+		
+		// crop
+		$cmds['crop'] = true;
+		
+	}	
+
+	// scale image to min or max
+	if ( isset($cmds['scale']) ) {	
+		$i->scaleImage($cmds['width'], $cmds['height'], ($cmds['scale']=='max' ? true : false));
+	}
+	else if ( isset($cmds['crop']) ) {
+
+        $width = $W  = $cmds['width'];
+        $height = $H = $cmds['height'];
+
+        $Y = _coord($v, $page['height'], $H);
+        $X = _coord($h, $page['width'], $W);
+
+		// crop me up
+		$i->cropImage($width, $height, $X, $Y);
+
+		// set page
+		$i->setImagePage($width, $height, $X, $Y);
+
+	}
+	else {
+		$i->thumbnailImage($cmds['width'], $cmds['height']);
+	}
+
+
 	$type = false;
 	
 	// output
-	if ( isset($cmds['output']) ) {
-		switch($cmds['output']) {
-			case 'png': $type = IMAGETYPE_PNG; break;
-			case 'jpg': $type = IMAGETYPE_JPEG; break;
-			case 'gif': $type = IMAGETYPE_GIF; break;
-			default: error("Only PNG, JPEG & GIF outputs are supported", 400);
-		};
-	}
-	else {
-		switch($obj->headers['type']) {
-			case 'image/png': $type = IMAGETYPE_PNG; break;
-			case 'image/jpeg': $type = IMAGETYPE_JPEG; break;
-			case 'image/gif': $type = IMAGETYPE_GIF; break;
-			default: error("Only PNG, JPEG & GIF outputs are supported", 400);
-		};	
-	}	
+	switch($cmds['output']) {
+		case 'png': $type = IMAGETYPE_PNG; break;
+		case 'jpg': $type = IMAGETYPE_JPEG; break;
+		case 'gif': $type = IMAGETYPE_GIF; break;
+		default: error("Only PNG, JPEG & GIF outputs are supported", 400);
+	};
 
 	// e
 	$e = getexp($b->expire);
@@ -227,13 +268,51 @@
 	header("Expires:".dt(time()+$e));
 	header("Cache-Control:max-age=".$e);		
 	header("Last-Modified:".dt($obj->headers['time']));			
+	header("X-Powered-By: http://cdnimag.es");
+	
+    // says
+    $says = array(
+            "It's not me. It's You",
+            "Live long and prosper",
+            "Doing linear scans over an assoc array is like clubbing someone to death with a loaded Uzi",
+            "Men have become the tools of their tools.",
+            "We all go a little mad sometimes.",
+            "So I got that goin' for me, which is nice.",
+            "I have one simple request. And that is to have sharks with frickin' laser beams attached to their heads!",
+            "Gentlemen, you can't fight in here. This is the War Room!",
+            "These go to 11.",
+            "Have fun storming the castle!",
+            "I saved latin.",
+            "Chuck Norris resizes his images on the fly",
+            "Chuck Norris resizes his images on the fly",
+            "Chuck Norris resizes his images on the fly",
+            "Chuck Norris resizes his images on the fly",                        
+    );	
+	
+	// says
+	header("X-CdnImages-Says: {$says[array_rand($says)]}");
 
-	// do it 
-	$t->display($type);
+	// type
+	switch($type) {
+		case IMAGETYPE_PNG: $i->setImageFormat("png"); break;
+		case IMAGETYPE_JPEG: $i->setImageFormat("jpeg"); break;
+		case IMAGETYPE_GIF: $i->setImageFormat("gif"); break;
+	};	
+	
+	// print 
+	exit($i);
 
-	// done
-	exit();
 
+function _coord($align, $param, $src) {
+    if ( $align == 'left' OR $align == 'top') {
+        $result = 0;
+    } elseif ( $align == "left" OR $align == 'bottom') {
+        $result = $param - $src;
+    } else {
+        $result = ($param - $src) >> 1;
+    }
+    return $result;
+}
 
 // eroro
 function error($msg, $code=500) {

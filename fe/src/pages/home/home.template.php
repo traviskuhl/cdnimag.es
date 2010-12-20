@@ -10,12 +10,36 @@ Hello <?php echo $_account->domain; ?>
 <div class="wrap wrap-pad">
 
 	<?php if ( $_account->dist == false ) { ?> 			
+	
+		<?php /*
 		<h3>How do you want this to work?</h3>
 		<p>How would you like to use our service?</p>
+		*/ ?>
+		
+		<h3>Your Amazon Webservice Account</h3>
+		<p>We'll set up a custom CloudFront Origin for you.</p>					
 	
 		<form method="post" action="/home">
 			<input type="hidden" name="do" value="dist">	
-		
+			<input type="hidden" name="opt" value="2">
+
+			<ul class="" id="_aws">
+				<li>
+					<label>
+						<em>Amazon Key</em>
+						<input type="text" name="f[key]" value="<?php echo p('key', false, $f); ?>">
+					</label>
+				</li>
+				<li>
+					<label>
+						<em>Amazon Secret</em>
+						<input type="password" name="f[sec]" value="<?php echo p('sec', false, $f); ?>">
+					</label>
+				</li>				
+			<li><button type="submit">Continue</button>	</li>				
+			</ul>			
+			
+			<?php /*
 			<ul class="dist-opts">
 				<li>
 					<h4><em>Simple</em> (no aws account required)</h4>
@@ -25,7 +49,7 @@ Hello <?php echo $_account->domain; ?>
 				<li>
 					<h4><em>Advanced</em> (aws account required)</h4>
 					<input type="radio" name="opt" value="2" onclick="Y.one('#_aws').toggleClass('hidden');">
-					<p>We'll set up a custom CloudFront Origin and S3 bucket for you.</p>			
+
 					
 					<ul class="hidden" id="_aws">
 						<li>
@@ -45,13 +69,12 @@ Hello <?php echo $_account->domain; ?>
 				</li>
 				<li><button type="submit">Continue</button>	</li>
 			</ul>
+			*/ ?>
 		
 
 		</form>
 		
 	<?php } else if ( $_account->dist_default == true ) { ?>		
-	
-		hello		
 		
 	<?php } else if ( $_account->dist_verified == false ) { ?>
 	
@@ -78,6 +101,16 @@ Hello <?php echo $_account->domain; ?>
 		</form>	
 	
 	<?php } else { ?>
+	
+		<h3>Distribution</h3>
+		<ul class="buckets">
+			<?php
+	
+				echo "<li><h4><a href='http://{$_account->dist->domain}'>{$_account->dist->domain}</a></h4> <em>CNAMEs: ".($_account->dist->cnames?implode(", ",$_account->dist->cnames):"none")."</em></li>";
+			
+			?>
+		</ul>
+		<br>
 
 		<h3>Buckets</h3>
 	
@@ -114,7 +147,7 @@ Hello <?php echo $_account->domain; ?>
 						<li>
 							<label>
 								<em>New Bucket</em>
-								<input type="text" name="f[new]" value="">
+								<input type="text" name="f[new]" value="" style="width:80px">.<?php echo $_account->domain; ?>
 							</label>
 						</li>					
 						<li style="padding:0 10px;"> -or- </li>
@@ -168,7 +201,7 @@ Hello <?php echo $_account->domain; ?>
 						<label><input type="checkbox" name="f[sig]" value="1" checked="checked"> Yes. Require signed requests</label>
 					</li>	
 					<li>
-						<em>Default Bicket</em>
+						<em>Default Bucket</em>
 						<label><input type="checkbox" name="f[default]" value="1"> Yes. Use this if none is given</label>
 					</li>																
 					<li>

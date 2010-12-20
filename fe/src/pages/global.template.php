@@ -14,10 +14,11 @@
 			</div>
 			<div id="bd">{$_body}</div>
 			<div id="ft">
-				&copy; 2010 <a href='http://kuhl.co'>kuhl.co</a> - 
+				&copy; 2010 <a href='http://the.kuhl.co'>kuhl.co</a> - 
 				all rights reserved - 
-				contact <a href="http://twitter.com/traviskuhl">@traviskuhl</a> or 
-				<a href="http://twitter.com/rochers">@rochers</a>
+				support: @<a href="http://twitter.com/kuhlco">kuhlco</a> -
+				made by @<a href="http://twitter.com/traviskuhl">traviskuhl</a> &amp; 
+				@<a href="http://twitter.com/rochers">rochers</a>
 			</div>
 		</div>
 	</body>

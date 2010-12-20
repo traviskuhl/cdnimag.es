@@ -15,10 +15,10 @@ meta description = Server
 meta changelog = changelog
 
 # settings
-set host 173.255.201.105
+set ip 173.255.201.105
 set port 80
 set listen Listen 80
-
+set host 
 
 # directorys
 dir - - - $(htdocs)

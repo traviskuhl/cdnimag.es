@@ -109,6 +109,16 @@ class api extends FrontEnd {
 				if ( ( p('bucket', false, $_POST) === false AND $item->default === true ) OR ( p('bucket', false, $_POST) == $item->name ) ) {
 					$bucket = $item; break;
 				}
+			}
+			
+			// if no bucket
+			if ( $bucket === false AND $account->buckets ) {
+				$bucket = $account->buckets->item('first');
+			}
+	
+			// no bucket
+			if ( $bucket === false ) {
+				$this->_error("No bucket selected", 400);
 			}		
 	
 		// headers
@@ -118,7 +128,7 @@ class api extends FrontEnd {
 		try {
 			$resp = $s3->putObject($data, $bucket->name, $image, S3::ACL_PUBLIC_READ, $hdr, $hdr);
 		}
-		catch ( Exception $e) { $this->_error($e->getMessage(), $e->getCode()); }
+		catch ( Exception $e ) { $this->_error($e->getMessage(), $e->getCode()); }
 	
 		// tell them we're all good
 		$this->_response(array(
