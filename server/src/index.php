@@ -186,7 +186,6 @@
 	}
 	
 	
-	
 	// frame
 	if ( isset($cmds['frame']) ) {
 	
@@ -246,6 +245,68 @@
 		$i->thumbnailImage($cmds['width'], $cmds['height']);
 	}
 
+	// gray
+	if ( isset($cmds['gray']) ) {
+		$i->setImageType(imagick::IMGTYPE_GRAYSCALE);
+	}
+	
+	// reflection
+	if ( isset($cmds['reflection']) ) {
+		
+		// bg
+		$bg = new ImagickPixel("#000000");
+		$opacity = (float)p('opacity', .3, $cmds);
+	
+			// try it 
+			try {
+				
+				// bg
+				$_bg = p('bg', "000000", $cmds);				
+				
+				// color
+				$bg = new ImagickPixel("#{$_bg}");
+				
+			}
+			catch (Exception $e) {}
+	
+		// re
+		$r = $i->clone();
+		
+		// flip it
+		$r->flipImage();
+	
+		$gradient = new Imagick();
+		
+		$gradient->newPseudoImage($r->getImageWidth(), $r->getImageHeight(), "gradient:transparent-" . $bg->getColorAsString() );
+		
+		/* Composite the gradient on the reflection */
+		$r->compositeImage($gradient, imagick::COMPOSITE_OVER, 0, 0);
+		
+		/* Add some opacity. Requires ImageMagick 6.2.9 or later */
+		$r->setImageOpacity( $opacity );
+		
+		/* Create an empty canvas */
+		$canvas = new Imagick();
+		
+		/* Canvas needs to be large enough to hold the both images */
+		$width = $i->getImageWidth();
+		$height = ($i->getImageHeight() * 2);
+		$canvas->newImage($width, $height, $bg);
+		$canvas->setImageFormat("png");
+		
+		/* Composite the original image and the reflection on the canvas */
+		$canvas->compositeImage($i, imagick::COMPOSITE_OVER, 0, 0);
+		$canvas->compositeImage($r, imagick::COMPOSITE_OVER, 0, $i->getImageHeight());	
+	
+		// reset 
+		$i = $canvas;
+	
+	}
+	
+	// rotate
+	if ( isset($cmds['rotate']) ) {
+		$i->rotateImage(new ImagickPixel("transparent"), (int)$cmds['rotate']);
+	}
 
 	$type = false;
 	

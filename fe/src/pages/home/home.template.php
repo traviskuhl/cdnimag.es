@@ -17,7 +17,7 @@ Hello <?php echo $_account->domain; ?>
 		*/ ?>
 		
 		<h3>Your Amazon Webservice Account</h3>
-		<p>We'll set up a custom CloudFront Origin for you.</p>					
+		<p>We'll set up a custom CloudFront Origin for you. You'll need your Amazon Web Service "Access Key Id" and "Secret Access Key." You can find them on your Amazon Web Service <a target="_blank" href="https://aws-portal.amazon.com/gp/aws/developer/account/index.html?ie=UTF8&action=access-key"> Account Page</a>. Note: You must have already setup both an Amazon <a target="_blank" href="https://console.aws.amazon.com/s3/home">S3</a> and <a target="_blank" href="https://console.aws.amazon.com/cloudfront/home">CloudFront</a>. You can setup both through the <a target="_blank" href="https://console.aws.amazon.com/">Amazon Console</a>.</p>
 	
 		<form method="post" action="/home">
 			<input type="hidden" name="do" value="dist">	
@@ -26,14 +26,14 @@ Hello <?php echo $_account->domain; ?>
 			<ul class="" id="_aws">
 				<li>
 					<label>
-						<em>Amazon Key</em>
+						<em>Access Key Id</em>
 						<input type="text" name="f[key]" value="<?php echo p('key', false, $f); ?>">
 					</label>
 				</li>
 				<li>
 					<label>
-						<em>Amazon Secret</em>
-						<input type="password" name="f[sec]" value="<?php echo p('sec', false, $f); ?>">
+						<em>Secret Access Key</em>
+						<input type="text" name="f[sec]" value="<?php echo p('sec', false, $f); ?>">
 					</label>
 				</li>				
 			<li><button type="submit">Continue</button>	</li>				

@@ -39,8 +39,8 @@ class home extends FrontEnd {
 			$f = p('f');
 			
 			// k and s
-			$k = $f['key'];
-			$s = $f['sec'];
+			$k = trim($f['key']);
+			$s = trim($f['sec']);
 			$opt = p('opt');
 		
 			// if yes 
@@ -68,6 +68,9 @@ class home extends FrontEnd {
 				
 					// good
 					$good = false;
+					
+					// msg
+					$args['msg'] = "We couldn't create your distribution. Try again!";					
 				
 					// first check to see if they have dist already
 					try {
@@ -87,7 +90,7 @@ class home extends FrontEnd {
 						}
 						
 					}
-					catch ( Exception $e ) {  }
+					catch ( Exception $e ) { }
 					
 					// what up
 					if ( $good === true ) {
@@ -122,13 +125,13 @@ class home extends FrontEnd {
 							// go here
 							$this->go( b::url('home') );
 						
-						}
-	
-						// msg
-						$args['msg'] = "We couldn't create your distribution. Try again!";
+						}	
 					
 					}
 				
+				}
+				else {
+					$args['msg'] = "You need a Key & Secret";
 				}
 				
 				// form

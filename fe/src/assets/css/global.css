@@ -19,6 +19,8 @@ html,body {
 	font-family: Helvetica;	
 }
 
+a { color: #333; }
+
 #hd h1 {
 	padding: 30px 5px;
 }
@@ -414,16 +416,12 @@ ul.examples li div {
 	margin-left: 230px;
 }
 
-ul.examples li div a {
-	color: #888;
-	text-decoration: none;
-	display: block;
-	font-size: 93%;
-}
 
 ul.examples li img {
 	border: solid 1px #eee;
 }
+
+ul.examples li img.noborder { border: none; }
 
 ul.examples li.explain {
 	background: #eee;
@@ -431,6 +429,15 @@ ul.examples li.explain {
 	text-align: center;
 	font-weight: bold;
 	padding: 20px;
+}
+
+a.tweet {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	color: #888;
+	text-shadow: #fff 1px 1px 1px;
+	text-decoration: none;
 }
 
 

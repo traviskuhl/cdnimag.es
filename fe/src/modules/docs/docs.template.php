@@ -24,6 +24,9 @@
 					<li><a href="#anc_11">Scale</a></li>					
 					<li><a href="#anc_12">Valign</a></li>					
 					<li><a href="#anc_13">Halign</a></li>
+					<li><a href="#anc_14a">Reflection</a></li>
+					<li><a href="#anc_14b">Background</a></li>
+					<li><a href="#anc_14c">Opacity</a></li>															
 					<li><a href="#anc_14">Output</a></li>
 				</ul>
 			</li>
@@ -121,11 +124,31 @@
 						<h4 id="anc_13">Halign</h4>
 						<p>The horizantal pixel or anchor position of the resulting image. Values: top, bottom, left, right, center. [Default: center]</p>
 						<code>Example: valign:top</code>						
-					</li>							
+					</li>
+					<li>
+						<h4 id="anc_14a">Reflection</h4>
+						<p>Reflect the source image. This will double the height of the image. Use bg: and opacity: to set background color and relection opacity. [Default: false]</p>
+						<code>Example: reflection:false</code>						
+					</li>
+					<li>
+						<h4 id="anc_14b">Background Color</h4>
+						<p>The background hex value (excluding the hash '#'). Only available when using reflection:</p>
+						<code>Example: bg:fff</code>						
+					</li>
+					<li>
+						<h4 id="anc_14c">Opacity</h4>
+						<p>Image opacity value (float). Only available when using reflection:</p>
+						<code>Example: opacity:.4</code>						
+					</li>
 					<li>
 						<h4 id="anc_14">Output</h4>
 						<p>The format of the resulting image. Values: jpeg, gif, png. [Default: original image format]</p>
 						<code>Example: output:png</code>						
+					</li>		
+					<li>
+						<h4 id="anc_14d">Rotate</h4>
+						<p>Rotate the image the give number of degrees. Will be processed after all other commands. Resulting image may not conform to size: command</p>
+						<code>Example: rotate:90</code>						
 					</li>		
 				</ul>				
 			</li>

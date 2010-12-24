@@ -43,4 +43,22 @@
 			<a href="http://demo.cf.cdnimag.es/size:150x150/frame:true/$/seinfeld-pic.jpg"><img src="http://demo.cf.cdnimag.es/size:150x150/frame:true/$/seinfeld-pic.jpg" width="117" height="120"></a>
 		</div>		
 	</li>
+	<li>
+		<h3>Rotated 95deg</h3>
+		<div>
+			<a href="http://demo.cf.cdnimag.es/rotate:95/output:png/$/seinfeld-pic.jpg"><img src="http://demo.cf.cdnimag.es/rotate:95/$/seinfeld-pic.jpg" width="117" height="120"></a>
+		</div>		
+	</li>
+	<li>
+		<h3>Grayscale 150x150 Thumbnail</h3>
+		<div>
+			<a href="http://demo.cf.cdnimag.es/size:150x150/frame:true/gray:true/$/seinfeld-pic.jpg"><img src="http://demo.cf.cdnimag.es/size:150x150/frame:true/gray:true/$/seinfeld-pic.jpg" width="117" height="120"></a>
+		</div>		
+	</li>
+	<li>
+		<h3>40% with reflection</h3>
+		<div>
+			<a href="http://demo.cf.cdnimag.es/percent:40/scale:max/reflection:true/bg:fff/$/seinfeld-pic.jpg"><img class="noborder" src="http://demo.cf.cdnimag.es/percent:40/scale:max/reflection:true/bg:fff/$/seinfeld-pic.jpg"></a>
+		</div>		
+	</li>
 </ul>

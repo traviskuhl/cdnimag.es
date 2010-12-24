@@ -16,10 +16,26 @@
 			<div id="ft">
 				&copy; 2010 <a href='http://the.kuhl.co'>kuhl.co</a> - 
 				all rights reserved - 
-				support: @<a href="http://twitter.com/kuhlco">kuhlco</a> -
 				made by @<a href="http://twitter.com/traviskuhl">traviskuhl</a> &amp; 
 				@<a href="http://twitter.com/rochers">rochers</a>
 			</div>
 		</div>
+		<a class="tweet" target="_blank" href="http://twitter.com/share?&count=horizontal&text=<?php echo urlencode("@traviskuhl "); ?>">send feedback</a>
+		
+		<?php if ( bDevMode === false ) { ?>
+			<script type="text/javascript">
+			var clicky = { log: function(){ return; }, goal: function(){ return; }};
+			var clicky_site_id = 66366361;
+			(function() {
+			 var s = document.createElement('script');
+			 s.type = 'text/javascript';
+			 s.async = true;
+			 s.src = ( document.location.protocol == 'https:' ? 'https://static.getclicky.com/js' : 'http://static.getclicky.com/js' );
+			 ( document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0] ).appendChild( s );
+			})();
+			</script>
+		<?php } ?>		
 	</body>
 </html>
+
+
