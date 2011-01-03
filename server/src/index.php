@@ -136,11 +136,10 @@
 		}	
 		
 	}
-
 	
 	// s3
 	$s3 = new S3( $account->aws->key, $account->aws->secret);
-
+	
 	// try to get this object
 	try {
 		$obj = $s3->getObject($b->name, trim($parts[1],"/"));
@@ -149,15 +148,66 @@
 		
 	// not found
 	if ( !is_object($obj) OR ( is_object($obj) AND $obj->code != 200 ) ) {
-		error("Could not find image.", 404);
-	}	
 	
+		// check to see if we have a src command
+		if ( isset($cmds['src']) ) {
+		
+			// url
+			$url = filter_var(base64_decode($cmds['src']), FILTER_VALIDATE_URL);
+		
+			// need a good url
+			if ( $url ) {
+			
+				// our command
+				$cmd = "curl -sL " . escapeshellarg($url);
+			
+				// try to get the image
+				$img = `$cmd`;
+				
+				// if there's an image
+				if ( $img ) {
+					
+					// header
+					$header = array("X-CdnImages-Src" => $url);
+
+					// right content type
+					switch(array_pop( explode(".", $url) )) {
+						case 'png': $header['Content-Type'] = "image/png"; break;
+						case 'jpg': $header['Content-Type'] = "image/jpeg"; break;
+						case 'gif': $header['Content-Type'] = "image/gif"; break;
+					};	
+					
+					// transfer it to s3 at path
+					$r = $s3->putObject($img, $b->name, trim($parts[1],"/"), S3::ACL_PUBLIC_READ, $header, $header);
+				
+					// if good lets now get it 
+					if ( $r ) {
+						$obj = $s3->getObject($b->name, trim($parts[1],"/"));
+					}
+				
+				}
+				else {
+					error("Could not find image.", 404);				
+				}
+				
+			}
+			else {
+				error("Could not find image.", 404);			
+			}
+			
+		}
+		else {
+			error("Could not find image.", 404);
+		}
+	}	
+		
 	// type
 	if ( !isset($cmds['output']) ) {	
 		switch($obj->headers['type']) {
 			case 'image/png': $cmds['output'] = "png"; break;
 			case 'image/jpeg': $cmds['output'] = "jpg"; break;
 			case 'image/gif': $cmds['output'] = "gif"; break;
+			default: $cmds['output'] = "png";
 		};			
 	}
 

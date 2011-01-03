@@ -16,11 +16,11 @@
 			<div id="ft">
 				&copy; 2010 <a href='http://the.kuhl.co'>kuhl.co</a> - 
 				all rights reserved - 
+				support: <a href='irc://irc.oftc.net/#cdnimages'>irc</a> or <a href="mailto:travis@kuhl.co">email</a> -				
 				made by @<a href="http://twitter.com/traviskuhl">traviskuhl</a> &amp; 
-				@<a href="http://twitter.com/rochers">rochers</a>
+				@<a href="http://twitter.com/rochers">rochers</a> 
 			</div>
 		</div>
-		<a class="tweet" target="_blank" href="http://twitter.com/share?&count=horizontal&text=<?php echo urlencode("@traviskuhl "); ?>">send feedback</a>
 		
 		<?php if ( bDevMode === false ) { ?>
 			<script type="text/javascript">
